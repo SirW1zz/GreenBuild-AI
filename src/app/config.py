@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+import os
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -19,17 +20,18 @@ class Settings(BaseModel):
         "http://127.0.0.1:5174",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "http://localhost:8001",
+        "http://127.0.0.1:8001",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
     ]
-    storage_file: Path = ROOT_DIR / "backend" / "storage" / "db.json"
-    report_dir: Path = ROOT_DIR / "backend" / "storage" / "reports"
-    gemini_model: str = "gemini-1.5-pro"
+    storage_file: Path = ROOT_DIR / "src" / "storage" / "db.json"
+    report_dir: Path = ROOT_DIR / "src" / "storage" / "reports"
+    gemini_model: str = "gemini-2.5-flash"
 
 
 @lru_cache
 def get_settings() -> Settings:
-    import os
-
     return Settings(
         gemini_api_key=os.getenv("GEMINI_API_KEY", ""),
     )
-
