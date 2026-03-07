@@ -1,12 +1,18 @@
 import { useState } from "react";
 
-const certificationOptions = [
-  "LEED Gold",
-  "LEED Platinum",
-  "BREEAM Excellent",
-  "Living Building Challenge",
-  "Passive House",
-  "WELL",
+const baseCertifications = [
+  "LEED",
+  "BREEAM",
+  "IGBC",
+  "WELL BUILDING STANDARD",
+  "CASBEE",
+];
+
+const leedLevelOptions = [
+  "Certified",
+  "Silver",
+  "Gold",
+  "Platinum"
 ];
 
 const locationOptions = [
@@ -34,7 +40,8 @@ export function MultiStepForm({ onSubmit, onPreviewClimate, climatePreview, load
     location: "Singapore",
     structure: "Steel composite frame",
     budget: "$14M - $18M",
-    certifications: ["LEED Gold", "WELL"],
+    certifications: [...baseCertifications],
+    leed_level: "Gold",
     notes: "Prioritize low embodied carbon materials without extending schedule beyond 6 months.",
     number_of_floors: "",
     soil_type: "",
@@ -147,23 +154,35 @@ export function MultiStepForm({ onSubmit, onPreviewClimate, climatePreview, load
 
         {/* Section 2: Targets & Strategy */}
         <div className="space-y-10">
-          <Field label="Target certifications">
-            <div className="flex flex-wrap gap-2">
-              {certificationOptions.map((option) => {
-                const active = form.certifications.includes(option);
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => toggleCertification(option)}
-                    className={`rounded-full border px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest transition-all ${
-                      active ? "border-accent bg-accent text-bg" : "border-white/10 text-white/40 hover:border-white/30 hover:text-white"
-                    }`}
-                  >
-                    {option}
-                  </button>
-                );
-              })}
+          <Field label="Target certifications (All evaluated by default)">
+            <div className="space-y-6">
+              <div className="flex flex-wrap gap-2">
+                {baseCertifications.map((option) => {
+                  const active = form.certifications.includes(option);
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => toggleCertification(option)}
+                      className={`rounded-full border px-5 py-2.5 text-[11px] font-bold uppercase tracking-widest transition-all ${
+                        active ? "border-accent bg-accent text-bg" : "border-white/10 text-white/40 hover:border-white/30 hover:text-white"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+              
+              {form.certifications.includes("LEED") && (
+                <div className="flex flex-col gap-3 animate-reveal">
+                  <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">LEED Certification Level</span>
+                  <LeedLevelSelector 
+                    value={form.leed_level} 
+                    onChange={(val) => updateField("leed_level", val)} 
+                  />
+                </div>
+              )}
             </div>
           </Field>
           
@@ -279,6 +298,46 @@ function SoilTypeSelector({ value, onChange }) {
                 }`}
               >
                 {soil}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function LeedLevelSelector({ value, onChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex w-full items-center justify-between rounded-full border border-white/10 bg-white/5 px-6 py-4 text-left text-white outline-none transition-all hover:bg-white/10 focus:border-accent"
+      >
+        <span className={value ? "text-white" : "text-white/20"}>{value || "Select Level"}</span>
+        <div className={`h-1 w-1 rounded-full bg-accent transition-all duration-300 ${isOpen ? "scale-[3]" : "scale-100"}`} />
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div className="absolute left-0 right-0 z-20 mt-3 max-h-[320px] overflow-y-auto rounded-3xl border border-white/10 bg-[#0e1210]/95 p-2 shadow-2xl animate-reveal custom-scrollbar backdrop-blur-xl">
+            {leedLevelOptions.map((level) => (
+              <button
+                key={level}
+                type="button"
+                onClick={() => {
+                  onChange(level);
+                  setIsOpen(false);
+                }}
+                className={`w-full rounded-2xl px-4 py-3 text-left text-sm transition-all hover:bg-white/5 ${
+                  value === level ? "bg-accent/10 text-accent font-bold" : "text-white/60 hover:text-white"
+                }`}
+              >
+                {level}
               </button>
             ))}
           </div>

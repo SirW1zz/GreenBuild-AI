@@ -24,6 +24,7 @@ class AnalyzeRequest(BaseModel):
     location: str = Field(..., min_length=2, max_length=120)
     structure: str = Field(..., min_length=2, max_length=120)
     budget: str = Field(..., min_length=1, max_length=120)
+    leed_level: str = Field(default="Gold")
     certifications: list[str] = Field(default_factory=list)
     notes: str = Field(default="", max_length=1000)
     number_of_floors: str | None = None
